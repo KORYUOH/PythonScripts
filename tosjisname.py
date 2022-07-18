@@ -17,7 +17,11 @@ def ParseArgv(args) -> dict:
     ret = {}
     for arg in args:
         if arg == 'verbose':
-            ret[arg] = True
+            ret['verbose'] = True
+        if arg == '-v':
+            ret['verbose'] = True
+        if arg == '--verbose':
+            ret['verbose'] = True
     return ret
 
 def Log(message: str):
