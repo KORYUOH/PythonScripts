@@ -4,10 +4,16 @@ import sys
 import os
 import re
 
-def is_imgfile( filename ) -> bool:
+logfilename = 'log.txt'
+
+def is_imgfile( filename: str ) -> bool:
     ext = filename[-4:]
     ext = ext.lower()
     return  (ext == ".png") | (ext == ".jpg") | (ext == ".gif") | (ext == "jpeg") | (ext == "avif")
+
+def Log(message: str):
+    logfile = open( logfilename , 'a' , encoding'utf-8' )
+    logfile.write(message)
 
 def main():
     files = os.listdir(os.getcwd())
