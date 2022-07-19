@@ -12,7 +12,7 @@ def is_imgfile( filename: str ) -> bool:
     return  (ext == ".png") | (ext == ".jpg") | (ext == ".gif") | (ext == "jpeg") | (ext == "avif")
 
 def Log(message: str):
-    logfile = open( logfilename , 'a' , encoding'utf-8' )
+    logfile = open( logfilename , 'a' , encoding='utf-8' )
     logfile.write(message)
 
 def main():
