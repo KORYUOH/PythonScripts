@@ -7,9 +7,10 @@ import re
 logfilename = 'log.txt'
 
 def is_imgfile( filename: str ) -> bool:
+    checkext =  [".png" , ".jpg" , ".gif" , "jpeg" , "avif"]
     ext = filename[-4:]
     ext = ext.lower()
-    return  (ext == ".png") | (ext == ".jpg") | (ext == ".gif") | (ext == "jpeg") | (ext == "avif")
+    return  ext in checkext
 
 def Log(message: str):
     logfile = open( logfilename , 'a' , encoding='utf-8' )
@@ -50,6 +51,15 @@ def main():
         except Image.UnidentifiedImageError as e:
             print(file + "is ErrorFile ---")
             print(e)
+            Log(file + "is ErrorFile ---")
+            Log(e)
+        except Exception as e:
+            print(e)
+            Log("Error File : " + file)
+            Log("\n")
+            Log(str(e))
+            Log("\n")
+            Log("\n")
 
 
 if __name__ == '__main__':
