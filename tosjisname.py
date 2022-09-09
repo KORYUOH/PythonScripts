@@ -22,6 +22,18 @@ def ParseArgv(args) -> dict:
             ret['verbose'] = True
         if arg == '--verbose':
             ret['verbose'] = True
+        if arg == '-c':
+            ret['check'] = True
+        if arg == '-check':
+            ret['check'] = True
+        if arg == '--c':
+            ret['check'] = True
+        if arg == '-f' :
+            ret['file'] = True
+        if arg == '-file' :
+            ret['file'] = True
+        if arg == '--f' :
+            ret['file'] = True
     return ret
 
 def Log(message: str):
@@ -38,12 +50,19 @@ def main(argv):
     files = os.listdir(os.getcwd())
     for file in files:
         if os.path.isfile(file):
-            VLog('skip in ' + file + '\n',option)
-            continue
+            if option['file'] :
+                pass
+            else:
+                VLog('skip in ' + file + '\n',option)
+                continue
         if not is_sjis_error(file):
             VLog('Skip is not SJIS Error : ' + file + '\n' , option)
             continue
-        rename(file)
+        if option['check'] :
+            Log('Error : ' + file + '\n')
+            Log('  -> ' + get_sjis_name(file) + '\n')
+        else:
+            rename(file)
 
 if __name__ == '__main__':
     main(sys.argv)
