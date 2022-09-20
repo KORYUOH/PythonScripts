@@ -49,10 +49,11 @@ def main():
             else : 
                 print(file + " is not image")
         except Image.UnidentifiedImageError as e:
-            print(file + "is ErrorFile ---")
+            print(file + " is ErrorFile ---")
             print(e)
-            Log(file + "is ErrorFile ---")
-            Log(e)
+            Log(file + " is ErrorFile --- ")
+            Log(str(e))
+            Log("\n")
         except Exception as e:
             print(e)
             Log("Error File : " + file)
