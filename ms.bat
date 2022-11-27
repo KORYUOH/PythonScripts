@@ -19,7 +19,7 @@ if "%2" EQU "comic" set defaultpath="K:\Comic"
 if "%2" EQU "comic" set secondpath=
 
 
-py "C:\Path\migemo.py" "%Word%" %defaultpath% %secondpath%
+py "C:\Path\migemo_search.py" "%Word%" %defaultpath% %secondpath%
 goto Finish
 
 :ErrWord
