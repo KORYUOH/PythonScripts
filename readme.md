@@ -12,6 +12,10 @@ AVIFとかpngをjpgに変換する
 Pillow
 Pillow-avif-plugin
 
+#### install
+pip install pillow
+pip install pillow-avif-plugin
+
 ## copyandexecure
 copy and execute 'conv'
 conv関係を同じフォルダの仮想にコピーし実行する
@@ -43,4 +47,17 @@ check file name length check
 
 仮想フォルダのファイル名の長さチェック
 桁数合わせなどでずれているとかをログファイルに出力
+
+## migemo_search
+find file using migemo by path 
+指定フォルダの中身をmigemoで検索する
+ms.bat を使って実行する前提
+中身のパスやエイリアス代わりの引数は個別で書き換える
+
+### require
+pymigemo
+
+### install
+pip install pymigemo
+
 
