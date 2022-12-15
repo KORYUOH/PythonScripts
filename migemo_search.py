@@ -2,16 +2,27 @@ import os
 import re
 import sys
 import migemo
+import yaml
     
+def read_config(yaml_path):
+    if not os.path.isfile(yaml_path):
+        print(yaml_path + " is not exists")
+        exit()
+    with open(yaml_path) as file:
+        return yaml.safe_load(file.read())
 
 def main(argv):
-    path = argv[2]
-    files = os.listdir(path)
-    if len(argv) > 3:
-        path2 = argv[3]
-        files2 = os.listdir(path2)
-        files.extend(files2)
-    migemodict = 'C:\Path\dict\cp932\migemo-dict'
+    files = []
+    if( len(argv)< 2 ):
+        return
+    config = read_config(argv[2])
+    for arg in config['folders']:
+        path = arg
+        print(path)
+        files.extend(os.listdir(path))
+        migemodict = 'C:\Path\dict\cp932\migemo-dict'
+    if os.path.isfile(config['dictionary']):
+        migemodict = config['dictionary']
 
     # print(files)
 

@@ -53,11 +53,22 @@ find file using migemo by path
 指定フォルダの中身をmigemoで検索する
 ms.bat を使って実行する前提
 中身のパスやエイリアス代わりの引数は個別で書き換える
+設定ファイルはyaml
+foldersの中に一度に検索するフォルダを列挙する
+
+```
+folders:
+ - directory
+ - directory
+ - directory
+```
 
 ### require
 pymigemo
+pyYAML
 
 ### install
 pip install pymigemo
+pip install pyYAML
 
 
