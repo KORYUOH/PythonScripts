@@ -14,10 +14,12 @@ set default_yaml=default.yaml
 set yaml_path=%default_yaml%
 
 if "%2" EQU "used" set yaml_path=used.yaml
+if "%2" EQU "used" goto Exec
 if "%2" EQU "comic" set yaml_path=comic.yaml
+if "%2" EQU "comic" goto Exec
 if "%2" NEQ "" set yaml_path=%2
 
-
+:Exec
 py "C:\Path\migemo_search.py" "%Word%" %~dp0%yaml_path%
 goto Finish
 
@@ -27,7 +29,7 @@ echo Request Search Word
 goto Finish
 
 :Help
-echo. %~nx0 ^<searchword^> ^[used comic^]
+echo. %~nx0 ^<searchword^> ^[used comic yamlname.yaml^]
 
 :Finish
 endlocal

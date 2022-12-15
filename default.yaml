@@ -2,3 +2,4 @@ dictionary: ''
 folders:
   - "C:/"
   - "C:/Users"
+verbose: True

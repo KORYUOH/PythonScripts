@@ -8,17 +8,28 @@ def read_config(yaml_path):
     if not os.path.isfile(yaml_path):
         print(yaml_path + " is not exists")
         exit()
-    with open(yaml_path) as file:
+    with open(yaml_path , encoding='utf-8') as file:
         return yaml.safe_load(file.read())
 
 def main(argv):
     files = []
+    
     if( len(argv)< 2 ):
         return
     config = read_config(argv[2])
+    
+    if 'verbose' in config :
+        Verbose = config['verbose']
+    else:
+        Verbose = False
+    
+    if Verbose:
+        print("=====================================")
+    
     for arg in config['folders']:
         path = arg
-        print(path)
+        if Verbose: 
+            print(path)
         files.extend(os.listdir(path))
         migemodict = 'C:\Path\dict\cp932\migemo-dict'
     if os.path.isfile(config['dictionary']):
@@ -26,6 +37,7 @@ def main(argv):
 
     # print(files)
 
+    print("=====================================")
 
     migemo_body = migemo.Migemo()
     migemo_search = migemo_body.query(argv[1])
