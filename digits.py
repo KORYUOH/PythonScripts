@@ -1,17 +1,25 @@
 ﻿import sys
 import os
 import re
+import argparse
 
-def main():
+def main(argv):
     path = os.getcwd()
     files = os.listdir(path)
     ## そろえる桁数
     digits = 3
     ## 変更する数値の位置
     position = 0
+    
+    parser = argparse.ArgumentParser(description='Digits Style')
+    parser.add_argument('--digits' , '-d' , type=int , help='digits of 0 fills' , default=digits)
+    parser.add_argument('--position' , '-pos' , '-p' , type=int , help='multi number fix position 0 origin',default=position)
+    arg = parser.parse_args()
+    digits = arg.digits
+    position = arg.position
 
     #フォーマット用（0埋め)文字列作成
-    formater = "{:0"+str(digits)+"d}"
+    formater = "{:0"+str(arg.digits)+"d}"
 
     # 置き換え用辞書
     dic={}
@@ -25,7 +33,7 @@ def main():
 
         # 指定位置の数値を整形
         for index2,text in enumerate(nums):
-            if index2 == position :
+            if index2 == arg.position :
                 # 数値が少ないので0埋め
                 if len(text) < digits:
                     nums[index2] = formater.format(int(text))
@@ -49,4 +57,4 @@ def main():
                 os.rename(key,value)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
