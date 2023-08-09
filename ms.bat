@@ -7,6 +7,7 @@ if "%1" EQU "-help" goto :Help
 if "%1" EQU "/?" goto :Help
 if "%1" EQU "-h" goto :Help
 if "%1" EQU "--help" goto :Help
+if "%1" EQU "--list" goto :List
 
 if "%1" EQU "" set /p Word=Search? ^>
 if "%Word%" EQU "" goto :ErrWord
@@ -26,6 +27,10 @@ goto Finish
 :ErrWord
 echo.
 echo Request Search Word
+goto Finish
+
+:List
+dir /w /b *.yaml
 goto Finish
 
 :Help
