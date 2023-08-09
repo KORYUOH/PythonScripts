@@ -15,6 +15,9 @@ def rename( path: str ):
 
 def ParseArgv(args) -> dict:
     ret = {}
+    ret['verbose'] = False
+    ret['check']   = False
+    ret['file']    = False
     for arg in args:
         if arg == 'verbose':
             ret['verbose'] = True
