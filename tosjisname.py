@@ -45,7 +45,8 @@ def Log(message: str):
 
 def VLog(message: str, option: dict):
     if 'verbose' in option:
-        Log(message)
+        if option['verbose'] :
+            Log(message)
 
 def main(argv):
     option = ParseArgv(argv)
