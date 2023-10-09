@@ -32,8 +32,9 @@ def main(argv):
             print(path)
         files.extend(os.listdir(path))
         migemodict = 'C:\Path\dict\cp932\migemo-dict'
-    if os.path.isfile(config['dictionary']):
-        migemodict = config['dictionary']
+    if 'dictionary' in config:
+        if os.path.isfile(config['dictionary']):
+            migemodict = config['dictionary']
 
     # print(files)
 
