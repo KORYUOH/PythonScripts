@@ -20,6 +20,11 @@ if "%2" EQU "comic" set yaml_path=comic.yaml
 if "%2" EQU "comic" goto Exec
 if "%2" NEQ "" set yaml_path=%2
 
+:ChkYamlPath
+if %yaml_path:~-5% EQU ".yaml" goto Exec
+set yaml_path=%yaml_path%.yaml
+
+
 :Exec
 py "C:\Path\migemo_search.py" "%Word%" %~dp0%yaml_path%
 goto Finish
