@@ -21,7 +21,7 @@ if "%2" EQU "comic" goto Exec
 if "%2" NEQ "" set yaml_path=%2
 
 :ChkYamlPath
-if %yaml_path:~-5% EQU ".yaml" goto Exec
+if "%yaml_path:~-5%" EQU ".yaml" goto Exec
 set yaml_path=%yaml_path%.yaml
 
 
