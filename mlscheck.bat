@@ -11,5 +11,6 @@ goto EOF
 
 :Check
 python mlsCheck.py --folder "%CD%" --mls "%mls%"
+pause
 :EOF
 endlocal
