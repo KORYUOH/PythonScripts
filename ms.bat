@@ -39,7 +39,8 @@ dir /w /b *.yaml
 goto Finish
 
 :Help
-echo. %~nx0 ^<searchword^> ^[used comic yamlname.yaml^]
+echo. %~nx0 ^<searchword^> ^[used comic yamlname.yaml^] --list
+echo --list show yaml list
 
 :Finish
 endlocal
