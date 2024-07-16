@@ -3,6 +3,7 @@ import re
 import sys
 import migemo
 import yaml
+import glob
     
 def read_config(yaml_path):
     if not os.path.isfile(yaml_path):
@@ -22,6 +23,11 @@ def main(argv):
         Verbose = config['verbose']
     else:
         Verbose = False
+
+    if 'recursive' in config :
+        Recursive = config['recursive']
+    else:
+        Recursive = False
     
     if Verbose:
         print("=====================================")
@@ -30,8 +36,14 @@ def main(argv):
         path = arg
         if Verbose: 
             print(path)
-        files.extend(os.listdir(path))
+
+        if os.path.isdir(path):
+            files.extend(os.listdir(path))
+        else:
+            files.extend(glob.glob(path,recursive=Recursive))
         migemodict = 'C:\Path\dict\cp932\migemo-dict'
+    files = [ os.path.basename(f) for f in files ]
+    files = list(dict.fromkeys(files))
     if 'dictionary' in config:
         if os.path.isfile(config['dictionary']):
             migemodict = config['dictionary']

@@ -35,7 +35,7 @@ echo Request Search Word
 goto Finish
 
 :List
-dir /w /b *.yaml
+dir %~dp0*.yaml /w /b 
 goto Finish
 
 :Help
