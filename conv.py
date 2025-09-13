@@ -7,7 +7,7 @@ import re
 logfilename = 'log.txt'
 
 def is_imgfile( filename: str ) -> bool:
-	checkext =	[".png" , ".jpg" , ".gif" , "jpeg" , "avif"]
+	checkext =	[".png" , ".jpg" , ".gif" , "jpeg" , "avif" , "webp"]
 	ext = filename[-4:]
 	ext = ext.lower()
 	return	ext in checkext
