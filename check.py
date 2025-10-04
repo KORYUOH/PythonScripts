@@ -26,6 +26,7 @@ def main():
         # フォルダの中身を回す
         infile = os.listdir(file)
         count = {}
+        ex = {}
         infolder = False
         for filename in infile:
             if os.path.isdir(filename):
@@ -33,6 +34,7 @@ def main():
             # print(filename + ' ' + str(len(filename)))
             if not len(filename) in count:
                 count[len(filename)]=1
+                ex[len(filename)] = filename
             else:
                 count[len(filename)] = count[len(filename)] + 1
 
@@ -46,6 +48,8 @@ def main():
                 txt.append(format(key , ' 4d'))
                 txt.append('\tcount : ')
                 txt.append(format(value , ' 4d'))
+                txt.append('\tex : ')
+                txt.append(ex[key])
                 txt.append('\n')
             logfile.writelines(txt)
 
