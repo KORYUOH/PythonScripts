@@ -1,6 +1,8 @@
 ﻿import os
 import re
 from rapidfuzz import fuzz
+from multiprocessing import Pool, cpu_count
+from collections import defaultdict
 
 TARGET_EXT = {".zip", ".rar"}
 
@@ -9,22 +11,22 @@ TARGET_EXT = {".zip", ".rar"}
 # ================================
 FILENAME_PATTERN = re.compile(
     r"""
-    ^(?:\([^)]*\)\s*)?          # (イベント名) → 任意
+    ^(?:\([^)]*\)\s*)?
     
 
 \[([^]]+)\]
 
-\s*              # [サークル名] → 必須
+\s*
     ([^(
 
-\[]+?)\s*               # タイトル → 必須
-    (?:\([^)]*\)\s*)?           # (ジャンル) → 任意
+\[]+?)\s*
+    (?:\([^)]*\)\s*)?
     (?:
 
 \[[^]]*\]
 
-\s*)?           # [情報] → 任意
-    \.(zip|rar)$                # 拡張子 → 必須
+\s*)?
+    \.(zip|rar)$
     """,
     re.VERBOSE | re.IGNORECASE
 )
@@ -37,10 +39,12 @@ def extract_circle_title(filename):
 
 
 # ================================
-# ② 前編／後編／中編の判定
+# ② 編作品の判定（前編・後編・中編・前・中・後）
 # ================================
-def detect_part(title):
-    return bool(re.search(r"(前編|後編|中編|前|中|後)", title))
+def detect_part_type(title):
+    if re.search(r"(前編|後編|中編|前|中|後)", title):
+        return "hen"  # 編作品
+    return None       # 通常作品
 
 
 # ================================
@@ -48,19 +52,10 @@ def detect_part(title):
 # ================================
 def normalize_title(title):
     t = title
-
-    # 数字除去（比較用）
     t = re.sub(r"\b\d+\b", "", t)
-
-    # ローマ数字除去
     t = re.sub(r"\b[IVXLC]+\b", "", t)
-
-    # 丸数字除去
     t = re.sub(r"[①②③④⑤⑥⑦⑧⑨⑩]", "", t)
-
-    # 前後編は除去しない（別作品扱いするため）
     t = re.sub(r"\s+", " ", t).strip()
-
     return t
 
 
@@ -90,48 +85,61 @@ def scan_folder_recursive(base_folder):
 
 
 # ================================
-# ⑥ rapidfuzz 類似クラスタリング
+# ⑥ サークル名ごとクラスタリング（並列化対象）
 # ================================
-def cluster_titles(items, threshold=80):
+def cluster_by_circle(circle_items):
     groups = []
     used = set()
 
-    for i in range(len(items)):
+    for i in range(len(circle_items)):
         if i in used:
             continue
 
-        base = items[i]
+        base = circle_items[i]
         base_path, base_circle, base_title = base
         base_norm = normalize_title(base_title)
         base_num = extract_number(base_title)
-        base_part = detect_part(base_title)
+        base_part = detect_part_type(base_title)
+        base_folder = os.path.dirname(base_path)
 
         group = [base]
         used.add(i)
 
-        for j in range(i + 1, len(items)):
+        for j in range(i + 1, len(circle_items)):
             if j in used:
                 continue
 
-            other = items[j]
+            other = circle_items[j]
             other_path, other_circle, other_title = other
             other_norm = normalize_title(other_title)
             other_num = extract_number(other_title)
-            other_part = detect_part(other_title)
+            other_part = detect_part_type(other_title)
+            other_folder = os.path.dirname(other_path)
 
-            # ★ サークル名が違う → 絶対に同じグループにしない
+            # サークル名違い → 絶対に混ぜない
             if base_circle != other_circle:
                 continue
 
-            # ★ 前編／後編が混ざっていたら絶対に同じグループにしない
-            if base_part != other_part:
+            # 数字が両方ある → 数字違いは別作品
+            if base_num and other_num and base_num != other_num:
                 continue
 
-            # 正規化タイトルで比較
-            score = fuzz.ratio(base_norm, other_norm)
+            # 数字が片方だけ → 別作品
+            if (base_num and not other_num) or (other_num and not base_num):
+                continue
 
-            # 類似している OR 同じ番号なら同一作品
-            if score >= threshold or (base_num and other_num and base_num == other_num):
+            # ★ 編作品（前後中編）はフォルダが違えば同一作品扱い
+            if base_part == "hen" and other_part == "hen":
+                if base_folder != other_folder:
+                    group.append(other)
+                    used.add(j)
+                    continue
+                else:
+                    continue  # 同じフォルダ → 別作品扱い
+
+            # 通常作品 → 正規化タイトルで比較
+            score = fuzz.ratio(base_norm, other_norm)
+            if score >= 80:
                 group.append(other)
                 used.add(j)
 
@@ -141,26 +149,28 @@ def cluster_titles(items, threshold=80):
 
 
 # ================================
-# ⑦ TXT 出力（ユニーク除外）
+# ⑦ TXT 出力（相対パス・./なし・拡張子除去）
 # ================================
-def export_clusters_to_txt(groups, output_file="similar_titles.txt"):
+def export_clusters_to_txt(all_groups, base_folder, output_file="similar_titles.txt"):
     with open(output_file, "w", encoding="utf-8") as f:
-        group_index = 1
+        for groups in all_groups:
+            for group in groups:
+                if len(group) <= 1:
+                    continue  # ユニーク除外
 
-        for group in groups:
-            if len(group) <= 1:
-                continue  # ユニークは除外
+                circle_name = group[0][1]
+                f.write(f"=== {circle_name} ===\n")
 
-            f.write(f"=== Group {group_index} ===\n")
-            group_index += 1
+                for item in group:
+                    full_path = item[0]
 
-            for item in group:
-                full_path = item[0]
-                filename = os.path.basename(full_path)
-                name_without_ext, _ = os.path.splitext(filename)
-                f.write(f"{name_without_ext}\n")
+                    rel_path = os.path.relpath(full_path, base_folder)
+                    rel_path = rel_path.lstrip("./")
 
-            f.write("\n")
+                    name_without_ext, _ = os.path.splitext(rel_path)
+                    f.write(f"{name_without_ext}\n")
+
+                f.write("\n")
 
     print(f"出力: {output_file}")
 
@@ -173,8 +183,15 @@ def main(folder=None):
         folder = os.path.dirname(os.path.abspath(__file__))
 
     items = scan_folder_recursive(folder)
-    groups = cluster_titles(items)
-    export_clusters_to_txt(groups)
+
+    circle_groups = defaultdict(list)
+    for item in items:
+        circle_groups[item[1]].append(item)
+
+    with Pool(cpu_count()) as pool:
+        all_groups = pool.map(cluster_by_circle, circle_groups.values())
+
+    export_clusters_to_txt(all_groups, folder)
 
 
 if __name__ == "__main__":
